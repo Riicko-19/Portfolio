@@ -662,3 +662,148 @@ a:hover {
   background: rgba(63, 208, 201, 0.08);
   border: 1px solid rgba(63, 208, 201, 0.2);
 }
+
+/* ========================================================================
+ * Region tags + Core label (in-world orientation)
+ * ===================================================================== */
+.region-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 11px;
+  background: rgba(7, 9, 18, 0.62);
+  border: 1px solid;
+  border-radius: 9px;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.3s ease, transform 0.2s ease, background 0.2s ease;
+}
+.region-tag:hover {
+  transform: translateY(-1px);
+  background: rgba(7, 9, 18, 0.88);
+}
+.region-tag-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.region-tag-domain {
+  font-size: 10px;
+  color: var(--term-dim);
+  letter-spacing: 0.03em;
+}
+.core-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--core-gold);
+  text-shadow: 0 0 16px rgba(255, 199, 107, 0.55);
+  white-space: nowrap;
+}
+
+/* ========================================================================
+ * Information terminal — knowledge console (Issue 6)
+ * ===================================================================== */
+.info-region {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+.info-title {
+  font-size: 22px;
+}
+.info-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 14px 0 4px;
+}
+.meta-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 12px;
+  background: rgba(10, 13, 24, 0.65);
+}
+.meta-k {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--term-dim);
+}
+.meta-v {
+  font-size: 13px;
+  color: var(--term-text);
+  text-transform: capitalize;
+}
+.stars {
+  color: var(--region-cerebellum);
+  letter-spacing: 1px;
+}
+.stars-off {
+  color: rgba(108, 122, 147, 0.4);
+}
+.info-section {
+  margin-top: 16px;
+}
+.section-h {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--term-dim);
+  padding-bottom: 7px;
+  margin-bottom: 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.info-body {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0;
+}
+.conn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.conn-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--term-text);
+}
+.conn-row:hover {
+  background: rgba(95, 168, 255, 0.1);
+  border-color: rgba(95, 168, 255, 0.2);
+}
+.conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.conn-name {
+  font-size: 13.5px;
+  flex: 1;
+}
+.conn-kind {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--term-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}

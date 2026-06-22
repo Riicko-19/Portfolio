@@ -29,6 +29,7 @@ export default function WindowManager() {
             x={w.x}
             y={w.y}
             z={w.z}
+            width={424}
             minimized={w.minimized}
             onClose={() => closeWindow(w.id)}
             onMinimize={() => minimizeWindow(w.id)}

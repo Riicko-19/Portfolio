@@ -1,19 +1,23 @@
 /**
- * Particle assembly shader (Blueprint §12 — formation sequence).
- * GLSL ES 1.00 for THREE.ShaderMaterial. Three injects `position`,
- * `projectionMatrix` and `modelViewMatrix`; we add `aStart` + `aSeed`.
- * Each point eases from its scattered start to its formed `position`, with a
- * per-point delay so the brain assembles in a staggered wave.
+ * Particle assembly shader (Blueprint §12; Issues 1 + 7).
+ * GLSL ES 1.00 for THREE.ShaderMaterial. Each point eases from a scattered
+ * start to its formed position with a per-point delay (staggered assembly),
+ * stays MONOCHROME blue during assembly, then its REGION colour saturates in
+ * near the end ("outline → colored brain"). Region hover boosts brightness.
  */
 export const formationVertex = /* glsl */ `
   uniform float uProgress;
   uniform float uTime;
   uniform float uSize;
   uniform float uPixelRatio;
+  uniform float uHoverRegion;
   attribute vec3 aStart;
   attribute float aSeed;
+  attribute vec3 aColor;
+  attribute float aRegion;
   varying float vAlpha;
   varying float vSeed;
+  varying vec3 vColor;
 
   float easeOutCubic(float x){ return 1.0 - pow(1.0 - x, 3.0); }
 
@@ -23,33 +27,40 @@ export const formationVertex = /* glsl */ `
     float e = easeOutCubic(local);
 
     vec3 pos = mix(aStart, position, e);
-    // Subtle idle drift once settled — the brain breathes (§12 motion).
     pos.y += sin(uTime * 0.35 + aSeed * 6.2831) * 0.06 * e;
     pos.x += cos(uTime * 0.30 + aSeed * 6.2831) * 0.05 * e;
 
+    // Region hover highlight (Issue 2): brighten the matching region.
+    float hov = step(abs(aRegion - uHoverRegion), 0.5);
+
+    // Stage colour: monochrome neural-blue during assembly, region colour in
+    // at the end (Issue 7 — "outline" then "colored brain").
+    vec3 baseCol = vec3(0.30, 0.55, 0.95);
+    float colorize = smoothstep(0.55, 1.0, uProgress);
+    vec3 c = mix(baseCol, aColor, colorize);
+    vColor = c * mix(1.0, 1.7, hov);
+
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = uSize * (0.5 + aSeed * 0.9) * uPixelRatio * (95.0 / -mv.z);
+    gl_PointSize = uSize * (0.5 + aSeed * 0.9) * uPixelRatio * (95.0 / -mv.z) * mix(1.0, 1.25, hov);
 
-    vAlpha = e;
+    vAlpha = e * mix(1.0, 1.5, hov);
     vSeed = aSeed;
   }
 `;
 
 export const formationFragment = /* glsl */ `
   precision mediump float;
-  uniform vec3 uColorA;
-  uniform vec3 uColorB;
   uniform float uOpacity;
   varying float vAlpha;
   varying float vSeed;
+  varying vec3 vColor;
 
   void main() {
     vec2 uv = gl_PointCoord - 0.5;
     float d = length(uv);
     if (d > 0.5) discard;
     float glow = smoothstep(0.5, 0.0, d);
-    vec3 col = mix(uColorA, uColorB, vSeed);
-    gl_FragColor = vec4(col, glow * vAlpha * uOpacity);
+    gl_FragColor = vec4(vColor, glow * vAlpha * uOpacity);
   }
 `;

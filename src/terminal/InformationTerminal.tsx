@@ -1,19 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { getNode, getNeighbourIds } from "@/content";
+import { getNode, getNeighbourIds, getRegion, getDegree } from "@/content";
 import { useMind } from "@/state/store";
 
 /**
- * Information terminal body (Blueprint §9) — renders a node's content. Bound to
- * a window by the WindowManager. Connected-node buttons re-select (re-focus the
- * camera), and "View as page" links to the SSR fallback (deep link).
+ * Information terminal (Blueprint §9; Issue 6) — a "knowledge console", not a
+ * tooltip. Strong type hierarchy, a metadata grid, section headers, and a
+ * structured Connected-Nodes list. Connection buttons re-select (re-focus the
+ * camera); "View as page" links to the SSR fallback.
  */
+function Stars({ value }: { value: number }) {
+  const n = Math.max(1, Math.round(value * 5));
+  return (
+    <span className="stars">
+      {"★".repeat(n)}
+      <span className="stars-off">{"★".repeat(5 - n)}</span>
+    </span>
+  );
+}
+
 export default function InformationTerminal({ nodeId }: { nodeId: string }) {
   const node = getNode(nodeId);
   const select = useMind((s) => s.select);
   if (!node) return null;
+  const region = getRegion(node.region);
   const neighbours = getNeighbourIds(nodeId);
+  const degree = getDegree(nodeId);
 
   return (
     <div className="info">
@@ -22,47 +35,91 @@ export default function InformationTerminal({ nodeId }: { nodeId: string }) {
         {node.status && (
           <span className={`info-status s-${node.status}`}>{node.status}</span>
         )}
+        {region && (
+          <span className="info-region" style={{ color: region.color }}>
+            ◖ {region.name}
+          </span>
+        )}
       </div>
+
       <h2 className="info-title">{node.title}</h2>
       {node.subtitle && <div className="info-sub">{node.subtitle}</div>}
-      <p className="info-body">{node.content}</p>
+
+      <div className="info-meta">
+        <div className="meta-cell">
+          <span className="meta-k">Type</span>
+          <span className="meta-v">{node.kind ?? "node"}</span>
+        </div>
+        <div className="meta-cell">
+          <span className="meta-k">Importance</span>
+          <span className="meta-v">
+            <Stars value={node.importance} />
+          </span>
+        </div>
+        <div className="meta-cell">
+          <span className="meta-k">Connections</span>
+          <span className="meta-v">{degree}</span>
+        </div>
+        <div className="meta-cell">
+          <span className="meta-k">Status</span>
+          <span className="meta-v">{node.status ?? "—"}</span>
+        </div>
+      </div>
+
+      <div className="info-section">
+        <div className="section-h">Overview</div>
+        <p className="info-body">{node.content}</p>
+      </div>
 
       {node.tags.length > 0 && (
-        <div className="info-tags">
-          {node.tags.map((t) => (
-            <span key={t} className="tag">
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {node.links.length > 0 && (
-        <div className="info-links">
-          {node.links.map((l) => (
-            <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-              {l.label} ↗
-            </a>
-          ))}
+        <div className="info-section">
+          <div className="section-h">Tags</div>
+          <div className="info-tags">
+            {node.tags.map((t) => (
+              <span key={t} className="tag">
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
       {neighbours.length > 0 && (
-        <div className="info-conns">
-          <div className="info-conns-label">Connected</div>
-          <div className="info-conns-list">
+        <div className="info-section">
+          <div className="section-h">Connected Nodes · {neighbours.length}</div>
+          <div className="conn-list">
             {neighbours.map((id) => {
               const n = getNode(id);
-              return n ? (
+              if (!n) return null;
+              const r = getRegion(n.region);
+              return (
                 <button
                   key={id}
-                  className="conn"
+                  className="conn-row"
                   onClick={() => select(id)}
                 >
-                  {n.title}
+                  <span
+                    className="conn-dot"
+                    style={{ background: r?.color ?? "#3fd0c9" }}
+                  />
+                  <span className="conn-name">{n.title}</span>
+                  <span className="conn-kind">{n.kind}</span>
                 </button>
-              ) : null;
+              );
             })}
+          </div>
+        </div>
+      )}
+
+      {node.links.length > 0 && (
+        <div className="info-section">
+          <div className="section-h">Links</div>
+          <div className="info-links">
+            {node.links.map((l) => (
+              <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
+                {l.label} ↗
+              </a>
+            ))}
           </div>
         </div>
       )}

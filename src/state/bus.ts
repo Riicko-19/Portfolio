@@ -8,6 +8,7 @@ type Handler<T> = (payload: T) => void;
 interface BusEvents {
   "camera:recenter": void;
   "camera:flyToNode": { nodeId: string };
+  "camera:frameRegion": { regionId: string };
 }
 
 type EventKey = keyof BusEvents;

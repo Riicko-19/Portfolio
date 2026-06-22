@@ -79,6 +79,10 @@ export interface RegionMeta {
   name: string;
   color: string;
   blurb: string;
+  /** Short cognitive-geography label, e.g. "Skills · Tech Stack". */
+  domain: string;
+  /** Macro hemisphere grouping (Blueprint §4 duality). */
+  hemisphere: "left" | "right" | "central";
   /** World-space center of the region (Blueprint §3 coordinate model). */
   center: [number, number, number];
   /** Approximate region radius in world units, for layout + framing. */

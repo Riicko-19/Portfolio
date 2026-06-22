@@ -1,49 +1,59 @@
-import type { RegionMeta } from "./schema";
+import type { RegionId, RegionMeta } from "./schema";
 
 /**
- * Region metadata (Blueprint §4 Brain Geography).
+ * Region metadata (Blueprint §4 Brain Geography) + cognitive geography.
  * Coordinate model (§3): X = left(-)/right(+), Y = up, Z = front(+)/back(-).
- * Phase 1 only populates the Cerebellum; the others are declared for the
- * world map + future phases but carry no nodes yet.
+ * Phase 1 only populates the Cerebellum; the others are visible geography
+ * (color, label, hover) but unpopulated until Phase 2.
  */
 export const REGIONS: Record<string, RegionMeta> = {
   frontal: {
     id: "frontal",
     name: "Frontal Lobe",
     color: "#7c6cff",
-    blurb: "Vision & Goals — roadmap and where the engineer is headed.",
-    center: [0, 5, 11],
+    blurb: "Goals, vision and where the engineer is headed.",
+    domain: "Goals · Future Vision",
+    hemisphere: "central",
+    center: [0, 6, 12],
     radius: 9,
   },
   parietal: {
     id: "parietal",
     name: "Parietal Lobe",
     color: "#4fb6c9",
-    blurb: "Navigation & Systems thinking — how problems get approached.",
-    center: [0, 8, -2],
+    blurb: "Logic, reasoning and systems thinking.",
+    domain: "Logic · Systems",
+    hemisphere: "right",
+    center: [6, 9, -2],
     radius: 8,
   },
   occipital: {
     id: "occipital",
     name: "Occipital Lobe",
     color: "#e85c9a",
-    blurb: "Visual & Creative — design, visualization, generative work.",
-    center: [0, 3, -12],
+    blurb: "Research, visualization and creative processing.",
+    domain: "Research · Visualization",
+    hemisphere: "right",
+    center: [3, 3, -13],
     radius: 7,
   },
   temporal: {
     id: "temporal",
     name: "Temporal Lobe",
     color: "#8fb84e",
-    blurb: "Memory & Journey — milestones and formative moments.",
-    center: [9, -3, 0],
+    blurb: "Memory, journey and personal history.",
+    domain: "Memory · Journey",
+    hemisphere: "left",
+    center: [-9, -2, 1],
     radius: 7,
   },
   cerebellum: {
     id: "cerebellum",
     name: "Cerebellum",
     color: "#e0a23c",
-    blurb: "Skills, Tech Stack & Tools — the technical arsenal.",
+    blurb: "Skills, tech stack and the technical arsenal.",
+    domain: "Skills · Tech Stack",
+    hemisphere: "left",
     center: [0, -6.5, -8],
     radius: 6,
   },
@@ -51,7 +61,9 @@ export const REGIONS: Record<string, RegionMeta> = {
     id: "stem",
     name: "Brain Stem",
     color: "#2c7a6b",
-    blurb: "Fundamentals — CS core, DSA, OS, the load-bearing base.",
+    blurb: "Fundamentals — CS core, the load-bearing base.",
+    domain: "Fundamentals · Core Systems",
+    hemisphere: "central",
     center: [0, -11, -4],
     radius: 3,
   },
@@ -59,13 +71,30 @@ export const REGIONS: Record<string, RegionMeta> = {
     id: "core",
     name: "Chanakya Core",
     color: "#ffc76b",
-    blurb: "Identity & Connection — the nucleus of the mind.",
+    blurb: "The nucleus of the mind — identity and intelligence.",
+    domain: "Identity · Nucleus",
+    hemisphere: "central",
     center: [0, -1, 0],
-    radius: 2,
+    radius: 2.2,
   },
 };
 
 export const REGION_LIST: RegionMeta[] = Object.values(REGIONS);
+
+/** Stable ordering → numeric index passed to the brain shader for tinting. */
+export const REGION_ORDER: RegionId[] = [
+  "frontal",
+  "parietal",
+  "occipital",
+  "temporal",
+  "cerebellum",
+  "stem",
+  "core",
+];
+
+export function regionIndex(id: RegionId): number {
+  return REGION_ORDER.indexOf(id);
+}
 
 export function getRegion(id: string): RegionMeta | undefined {
   return REGIONS[id];

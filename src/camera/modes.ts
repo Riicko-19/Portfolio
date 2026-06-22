@@ -14,8 +14,8 @@ export const CAMERA_TUNING = {
   orbitMin: 14,
   orbitMax: 80,
   /** Default world point the orbit looks at when nothing is selected. */
-  homeTarget: [0, -2, -4] as [number, number, number],
+  homeTarget: [0, -1, -3] as [number, number, number],
   /** Default camera position for the initial "ready" framing (pulled back so
-   * the additive particle field reads as a brain, not an overexposed blob). */
-  homePosition: [24, 8, 34] as [number, number, number],
+   * the whole brain + surrounding depth read as a world, not an object). */
+  homePosition: [27, 10, 40] as [number, number, number],
 } as const;

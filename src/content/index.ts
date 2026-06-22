@@ -1,6 +1,13 @@
 import { NodeSchema, type Edge, type MindNode, type SearchDoc } from "./schema";
 import { cerebellumRaw } from "./nodes.cerebellum";
-import { REGION_LIST, REGIONS, getRegion } from "./regions";
+import { coreRaw } from "./nodes.core";
+import {
+  REGION_LIST,
+  REGION_ORDER,
+  REGIONS,
+  getRegion,
+  regionIndex,
+} from "./regions";
 
 /**
  * Content API (Blueprint §16 `src/content`) — the ONLY module that reads raw
@@ -9,7 +16,10 @@ import { REGION_LIST, REGIONS, getRegion } from "./regions";
  */
 
 // --- validate (Blueprint §5: Zod at load) -----------------------------------
-const ALL_NODES: MindNode[] = NodeSchema.array().parse([...cerebellumRaw]);
+const ALL_NODES: MindNode[] = NodeSchema.array().parse([
+  ...cerebellumRaw,
+  ...coreRaw,
+]);
 
 const NODE_BY_ID = new Map<string, MindNode>(ALL_NODES.map((n) => [n.id, n]));
 
@@ -35,6 +45,17 @@ function buildEdges(nodes: MindNode[]): Edge[] {
 }
 
 const ALL_EDGES: Edge[] = buildEdges(ALL_NODES);
+
+// --- connection count per node (drives node hierarchy, Blueprint §4) --------
+const DEGREE = new Map<string, number>();
+for (const e of ALL_EDGES) {
+  DEGREE.set(e.a, (DEGREE.get(e.a) ?? 0) + 1);
+  DEGREE.set(e.b, (DEGREE.get(e.b) ?? 0) + 1);
+}
+
+export function getDegree(id: string): number {
+  return DEGREE.get(id) ?? 0;
+}
 
 // --- search docs (Blueprint §8: client index source) ------------------------
 const SEARCH_DOCS: SearchDoc[] = ALL_NODES.map((n) => ({
@@ -81,5 +102,6 @@ export function getPopulatedRegions() {
   return REGION_LIST.filter((r) => ids.has(r.id));
 }
 
-export { REGIONS, REGION_LIST, getRegion };
+export { REGIONS, REGION_LIST, REGION_ORDER, getRegion, regionIndex };
 export type { MindNode, Edge, SearchDoc };
+export type { RegionId, RegionMeta } from "./schema";

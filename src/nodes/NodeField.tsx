@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import type { MindNode } from "@/content";
+import { getDegree, type MindNode } from "@/content";
 import type { Vec3 } from "@/state/store";
 import { useMind } from "@/state/store";
 
@@ -27,8 +27,15 @@ export default function NodeField({
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const ids = useMemo(() => nodes.map((n) => n.id), [nodes]);
+  // Node hierarchy (Issue 4): size = importance × kind × connection count.
   const baseSizes = useMemo(
-    () => nodes.map((n) => 0.38 + n.importance * 0.5),
+    () =>
+      nodes.map((n) => {
+        const kindMul =
+          n.kind === "project" ? 1.25 : n.kind === "skill" ? 0.92 : 1;
+        const degree = getDegree(n.id);
+        return (0.32 + n.importance * 0.6) * kindMul * (1 + degree * 0.07);
+      }),
     [nodes],
   );
   const colors = useMemo(

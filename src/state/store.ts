@@ -37,6 +37,10 @@ interface MindState {
   /** Select a node: focuses the camera and opens its Information terminal. */
   select: (id: string | null) => void;
 
+  // --- region orientation (Blueprint §3/§4) ---
+  hoveredRegionId: string | null;
+  setHoveredRegion: (id: string | null) => void;
+
   // --- camera intent (Director is the sole executor) ---
   cameraMode: CameraMode;
 
@@ -70,6 +74,9 @@ export const useMind = create<MindState>((set, get) => ({
   hoveredNodeId: null,
   selectedNodeId: null,
   setHovered: (hoveredNodeId) => set({ hoveredNodeId }),
+
+  hoveredRegionId: null,
+  setHoveredRegion: (hoveredRegionId) => set({ hoveredRegionId }),
 
   select: (id) => {
     if (id === null) {

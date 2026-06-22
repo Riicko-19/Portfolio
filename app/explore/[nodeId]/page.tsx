@@ -46,7 +46,7 @@ export default async function NodePage({
     <main className="node-page">
       <nav className="node-nav">
         <Link href="/explore">← All nodes</Link>
-        <Link href={`/?node=${node.id}`}>Open in 3D ↗</Link>
+        <Link href={`/brain/${node.id}`}>Open in 3D ↗</Link>
       </nav>
 
       <span className="muted small">
