@@ -62,7 +62,6 @@ export default function CameraDirector({
   const travel = useRef<TravelState | null>(null);
   const savedSmooth = useRef<number | null>(null);
   const camera = useThree((s) => s.camera);
-  const baseFov = useRef<number | null>(null);
 
   const frameOrbit = (transition: boolean) => {
     const c = controls.current;
@@ -162,19 +161,20 @@ export default function CameraDirector({
     const tr = travel.current;
     const c = controls.current;
 
-    // Organic camera micro-motion (Phase 2.5): a barely-there FOV breathe when
-    // idle makes the world feel alive without disorienting. Skip during travel.
-    const cam = camera as THREE.PerspectiveCamera;
-    if (cam.isPerspectiveCamera) {
-      if (baseFov.current == null) baseFov.current = cam.fov;
-      if (!tr && useMind.getState().phase === "ready") {
-        const t = state.clock.elapsedTime;
-        const target = baseFov.current + Math.sin(t * 0.5) * 0.28;
-        if (Math.abs(cam.fov - target) > 0.001) {
-          cam.fov = target;
-          cam.updateProjectionMatrix();
-        }
-      }
+    // Camera turbulence (Phase 2.5): a continuous, low-amplitude pseudo-noise
+    // drift so the camera always "breathes" — even when locked on a target or
+    // riding a synapse. Applied AFTER camera-controls has written this frame's
+    // transform (this component mounts after <CameraControls>), so it layers on
+    // top without accumulating — the rig overwrites position next frame.
+    if (useMind.getState().phase === "ready") {
+      const t = state.clock.elapsedTime;
+      const A = 0.16;
+      camera.position.x +=
+        (Math.sin(t * 0.43) + Math.sin(t * 0.91 + 1.3) * 0.5) * A;
+      camera.position.y +=
+        (Math.sin(t * 0.37 + 2.1) + Math.sin(t * 0.71) * 0.5) * A * 0.7;
+      camera.position.z +=
+        (Math.cos(t * 0.39 + 0.6) + Math.cos(t * 0.83 + 2.4) * 0.5) * A;
     }
 
     if (!tr || !c) return;

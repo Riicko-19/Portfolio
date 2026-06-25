@@ -2,6 +2,12 @@
 
 import { useRef } from "react";
 import { CameraControls, Stats } from "@react-three/drei";
+import {
+  EffectComposer,
+  Bloom,
+  DepthOfField,
+  Vignette,
+} from "@react-three/postprocessing";
 import type CameraControlsImpl from "camera-controls";
 import Backdrop from "@/world/Backdrop";
 import AmbientField from "@/world/AmbientField";
@@ -10,6 +16,7 @@ import RegionSystem from "@/region/RegionSystem";
 import CoreAnchor from "@/region/CoreAnchor";
 import RegionNodes from "@/region/RegionNodes";
 import Synapses from "@/nodes/Synapses";
+import NeuralSwarm from "@/nodes/NeuralSwarm";
 import CameraDirector from "@/camera/CameraDirector";
 import CameraReporter from "@/camera/CameraReporter";
 import { getPopulatedRegions } from "@/content";
@@ -45,6 +52,26 @@ export default function Scene({ perf }: { perf: boolean }) {
         <RegionNodes key={r.id} regionId={r.id} />
       ))}
       <Synapses />
+      <NeuralSwarm />
+
+      {/* Depth + bloom (Phase 2.5): firing neurons flare organically (bloom),
+          near particles melt into bokeh and far structure dissolves (DoF). */}
+      <EffectComposer enableNormalPass={false} multisampling={0}>
+        <DepthOfField
+          focusDistance={0.02}
+          focalLength={0.22}
+          bokehScale={1.6}
+          height={480}
+        />
+        <Bloom
+          mipmapBlur
+          intensity={0.7}
+          luminanceThreshold={0.88}
+          luminanceSmoothing={0.28}
+          radius={0.7}
+        />
+        <Vignette eskil={false} offset={0.22} darkness={0.72} />
+      </EffectComposer>
 
       {perf && <Stats />}
     </>

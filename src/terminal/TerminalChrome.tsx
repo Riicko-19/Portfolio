@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
+import gsap from "gsap";
 
 /**
  * macOS-style window frame (Blueprint §9) — traffic lights, draggable title
@@ -22,6 +23,33 @@ interface Props {
 
 export default function TerminalChrome(p: Props) {
   const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const winRef = useRef<HTMLDivElement>(null);
+
+  // Asynchronous UI materialization (Phase 2.5): the window doesn't pop — after
+  // the node fires (immediately on select), we wait 0.4s while the region
+  // "processes", then the terminal blooms into existence out of the glow.
+  // useLayoutEffect + gsap.set the "from" state pre-paint so there is no flash,
+  // and we DON'T keep opacity in React's style prop (a drag re-render would
+  // otherwise clobber gsap's inline opacity and hide the window).
+  useLayoutEffect(() => {
+    const el = winRef.current;
+    if (!el) return;
+    const tween = gsap.fromTo(
+      el,
+      { opacity: 0, scale: 0.9, filter: "blur(8px)" },
+      {
+        opacity: 1,
+        scale: 1,
+        filter: "blur(0px)",
+        duration: 0.6,
+        delay: 0.4,
+        ease: "power3.out",
+      },
+    );
+    return () => {
+      tween.kill();
+    };
+  }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
     // Don't start a drag (or capture the pointer) when the press lands on a
@@ -48,8 +76,15 @@ export default function TerminalChrome(p: Props) {
 
   return (
     <div
+      ref={winRef}
       className="term-window"
-      style={{ left: p.x, top: p.y, zIndex: p.z, width: p.width ?? 364 }}
+      style={{
+        left: p.x,
+        top: p.y,
+        zIndex: p.z,
+        width: p.width ?? 364,
+        transformOrigin: "50% 0%",
+      }}
       onMouseDown={p.onFocus}
     >
       <div

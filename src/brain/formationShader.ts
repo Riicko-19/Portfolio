@@ -33,20 +33,23 @@ export const formationVertex = /* glsl */ `
     // Region hover highlight (Issue 2): brighten the matching region.
     float hov = step(abs(aRegion - uHoverRegion), 0.5);
 
-    // Stage colour: monochrome neural-blue during assembly, region colour in
-    // at the end (Issue 7 — "outline" then "colored brain").
-    vec3 baseCol = vec3(0.30, 0.55, 0.95);
-    float colorize = smoothstep(0.55, 1.0, uProgress);
+    // Unified deep-teal tissue (Phase 2.5): chrominance only on firing. During
+    // assembly it is monochrome teal; a faint region undertone settles in at
+    // the end, but the candy-bright per-region colour is gone.
+    vec3 baseCol = vec3(0.11, 0.42, 0.47);
+    float colorize = smoothstep(0.55, 1.0, uProgress) * 0.30;
     vec3 c = mix(baseCol, aColor, colorize);
 
-    // Idle neural activity (Phase 2.5): once formed, brightness bands travel
-    // through the tissue and points flicker — the brain "thinks" while idle.
+    // Idle neural activity (Phase 2.5): amber-gold electrical waves sweep the
+    // deep tissue and points flicker — the brain "thinks" while idle.
     float formed = smoothstep(0.95, 1.0, uProgress);
     float wave = sin(pos.y * 0.22 + pos.x * 0.12 - uTime * 1.1 + aSeed * 6.2831);
     float flick = 0.5 + 0.5 * sin(uTime * (1.4 + aSeed * 2.0) + aSeed * 40.0);
-    float activity = formed * (0.28 * smoothstep(0.35, 1.0, wave) + 0.10 * flick);
+    float activity = formed * (0.30 * smoothstep(0.35, 1.0, wave) + 0.10 * flick);
 
-    vColor = c * mix(1.0, 1.7, hov) * (1.0 + activity * 1.5);
+    vec3 gold = vec3(1.0, 0.80, 0.52);
+    c = mix(c, gold, clamp(activity * 0.9 + hov * 0.25, 0.0, 1.0));
+    vColor = c * mix(1.0, 1.6, hov) * (1.0 + activity * 1.4);
 
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mv;

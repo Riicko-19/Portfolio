@@ -500,8 +500,11 @@ a:hover {
   padding: 3px 9px;
   border-radius: 7px;
   color: var(--term-text);
-  background: rgba(7, 9, 18, 0.7);
-  border: 1px solid rgba(224, 162, 60, 0.3);
+  /* Glassy, not a solid pill — the text reads as floating in the glow. */
+  background: rgba(7, 9, 18, 0.32);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(224, 162, 60, 0.22);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   transform: translateY(-26px);
 }
 .node-label.is-selected {

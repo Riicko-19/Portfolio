@@ -15,21 +15,26 @@ import { useMind } from "@/state/store";
  * owning node id via the ordered id list.
  */
 const dummy = new THREE.Object3D();
-const halo = new THREE.Object3D();
 const tmpColor = new THREE.Color();
-const WHITE = new THREE.Color("#ffffff");
-// 4-tier hierarchy (Phase 2 §3): base radius + brightness lift toward white.
+// Unified bioluminescent base (Phase 2.5): the resting tissue is deep teal —
+// chrominance (gold) only manifests when a neuron FIRES. Region identity is a
+// faint undertone so orientation still reads up close, but the candy-cloud of
+// per-node neon is gone.
+const BASE = new THREE.Color("#1c6e7b");
+const GOLD = new THREE.Color("#ffcf8a");
+// 4-tier hierarchy (Phase 2 §3): base radius.
 const TIER_SIZE: Record<string, number> = {
   legendary: 1.7,
   major: 1.06,
   standard: 0.72,
   minor: 0.5,
 };
+// How much resting brightness each tier carries (legendary glows a touch more).
 const TIER_BRIGHT: Record<string, number> = {
-  legendary: 0.5,
-  major: 0.28,
-  standard: 0.16,
-  minor: 0.08,
+  legendary: 0.55,
+  major: 0.42,
+  standard: 0.34,
+  minor: 0.28,
 };
 // Breathing amplitude per tier (Phase 2.5 "neuron behaviour"): legendary
 // neurons pulse with substantially more activity than minor ones.
@@ -60,7 +65,6 @@ export default function NodeField({
   positions: Record<string, Vec3>;
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const haloRef = useRef<THREE.InstancedMesh>(null);
   const ids = useMemo(() => nodes.map((n) => n.id), [nodes]);
   // Node hierarchy (Phase 2 §3): size by tier (legendary→minor).
   const baseSizes = useMemo(
@@ -73,13 +77,17 @@ export default function NodeField({
     () => nodes.map((n) => REGION_PULSE[n.region] ?? 1),
     [nodes],
   );
-  // Region colour, brightened toward white by tier.
+  // Resting colour: the unified teal base with a faint region undertone.
   const colors = useMemo(
     () =>
       nodes.map((n) => {
-        const c = new THREE.Color(REGIONS[n.region]?.color ?? "#3fd0c9");
-        return c.lerp(WHITE, TIER_BRIGHT[getTier(n)] ?? 0.1);
+        const region = new THREE.Color(REGIONS[n.region]?.color ?? "#3fd0c9");
+        return BASE.clone().lerp(region, 0.22);
       }),
+    [nodes],
+  );
+  const restBright = useMemo(
+    () => nodes.map((n) => TIER_BRIGHT[getTier(n)] ?? 0.32),
     [nodes],
   );
   const scales = useRef<number[]>(nodes.map(() => 0));
@@ -92,7 +100,6 @@ export default function NodeField({
 
   useFrame((state, dt) => {
     const mesh = meshRef.current;
-    const halos = haloRef.current;
     if (!mesh) return;
     const { phase, hoveredNodeId, selectedNodeId, discovered } =
       useMind.getState();
@@ -124,7 +131,7 @@ export default function NodeField({
 
       // Neuron breathing: emissive glow oscillation paced by region.
       const f = (fire.current[i] = Math.max(0, fire.current[i] - dt * 1.6));
-      const breathePulse = 1 + Math.sin(t * rates[i] + i * 1.7) * amp;
+      const breathePulse = 0.5 + Math.sin(t * rates[i] + i * 1.7) * 0.5;
       const breatheScale = 1 + Math.sin(t * rates[i] * 0.9 + i * 1.7) * 0.04;
 
       dummy.position.set(p[0], p[1], p[2]);
@@ -132,33 +139,29 @@ export default function NodeField({
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
 
-      // Colour brightness: discovery + breathing + hover/fire discharge.
-      let bright = (seen ? 1 : 0.4) * breathePulse;
-      if (id === selectedNodeId) bright += 0.45;
-      else if (id === hoveredNodeId) bright += 0.2;
-      bright += f * f * 1.6; // firing flash
-      tmpColor.copy(colors[i]).multiplyScalar(bright);
+      // Activity drives BOTH chrominance and brightness (chrominance via
+      // firing): resting tissue is dim teal; activity warms it toward gold and
+      // brightens it past the bloom threshold so it flares.
+      const sel = id === selectedNodeId;
+      const hov = id === hoveredNodeId;
+      let activity = restBright[i] * (0.55 + 0.45 * breathePulse * amp * 8);
+      if (hov) activity += 0.35;
+      if (sel) activity += 0.6;
+      activity += f * f * 1.7; // firing flash
+      if (!seen) activity *= 0.45;
+      const warm = THREE.MathUtils.clamp(
+        (sel ? 0.7 : hov ? 0.45 : 0) + f * 0.8,
+        0,
+        1,
+      );
+      tmpColor
+        .copy(colors[i])
+        .lerp(GOLD, warm)
+        .multiplyScalar(THREE.MathUtils.clamp(activity, 0.12, 3));
       mesh.setColorAt(i, tmpColor);
-
-      // Additive glow halo: soft energy field around each neuron.
-      if (halos) {
-        const glow =
-          (seen ? 1 : 0.45) *
-          (0.7 + Math.sin(t * rates[i] + i * 1.7) * 0.3 + f * 1.4);
-        halo.position.set(p[0], p[1], p[2]);
-        halo.scale.setScalar(scales.current[i] * (2.4 + amp * 2) * breatheScale);
-        halo.updateMatrix();
-        halos.setMatrixAt(i, halo.matrix);
-        tmpColor.copy(colors[i]).multiplyScalar(glow);
-        halos.setColorAt(i, tmpColor);
-      }
     }
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    if (halos) {
-      halos.instanceMatrix.needsUpdate = true;
-      if (halos.instanceColor) halos.instanceColor.needsUpdate = true;
-    }
   });
 
   const onMove = (e: ThreeEvent<PointerEvent>) => {
@@ -185,22 +188,6 @@ export default function NodeField({
 
   return (
     <>
-      {/* Soft additive energy halo around every neuron (one draw call). */}
-      <instancedMesh
-        ref={haloRef}
-        args={[undefined, undefined, nodes.length]}
-        raycast={() => null}
-      >
-        <sphereGeometry args={[1, 12, 12]} />
-        <meshBasicMaterial
-          transparent
-          opacity={0.16}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          toneMapped={false}
-        />
-      </instancedMesh>
-
       <instancedMesh
         ref={meshRef}
         args={[undefined, undefined, nodes.length]}

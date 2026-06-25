@@ -23,9 +23,9 @@ const C = new THREE.Vector3();
 const L1 = new THREE.Vector3();
 const L2 = new THREE.Vector3();
 const tmpCol = new THREE.Color();
-const baseCol = new THREE.Color("#2f9fb0"); // resting fibre (cool teal)
-const hotCol = new THREE.Color("#a6ecff"); // firing signal (bright cyan-white)
-const warmCol = new THREE.Color("#ffd49a"); // core-broadcast front (the one warm)
+const baseCol = new THREE.Color("#236f7e"); // resting fibre (deep teal tissue)
+const hotCol = new THREE.Color("#ffcf8a"); // firing signal = gold electrical wave
+const warmCol = new THREE.Color("#ffe2ad"); // core-broadcast front (brightest gold)
 
 // Region personality → firing rate & cadence (Phase 2.5 "Region Personality").
 const REGION_RATE: Record<string, number> = {

@@ -45,14 +45,15 @@ export default function BrainFormation() {
     () => ({
       uProgress: { value: 0 },
       uTime: { value: 0 },
-      uSize: { value: 7 },
+      uSize: { value: 6 },
       uPixelRatio: {
         value: Math.min(
           typeof window !== "undefined" ? window.devicePixelRatio : 1,
           2,
         ),
       },
-      uOpacity: { value: 0.62 },
+      // Lowered so the dense additive tissue stops stacking into a white wash.
+      uOpacity: { value: 0.4 },
       uHoverRegion: { value: -1 },
     }),
     [],
