@@ -1,23 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import Scene from "@/three/Scene";
 import BootTerminal from "@/terminal/BootTerminal";
 import WindowManager from "@/terminal/WindowManager";
 import SpotlightTerminal from "@/terminal/SpotlightTerminal";
 import Hud from "@/ui/Hud";
+import Compass from "@/navigation/Compass";
+import Minimap from "@/navigation/Minimap";
+import TravelHud from "@/navigation/TravelHud";
 import GlobalHotkeys from "@/navigation/GlobalHotkeys";
 import DeepLink from "@/navigation/DeepLink";
+import { useMind } from "@/state/store";
 import { CAMERA_TUNING } from "@/camera/modes";
 
 /**
- * The 3D experience client island (Blueprint §14 — dynamically imported with
- * ssr:false). The Canvas renders the world; the DOM overlays (terminals,
- * spotlight, HUD) and the keyboard/deep-link controllers are siblings.
+ * The 3D experience client island (Blueprint §14). Canvas + the DOM overlays
+ * (terminals, spotlight, HUD, compass, minimap, travel HUD) + the keyboard /
+ * deep-link / persistence controllers.
  */
 export default function Experience() {
   const perf =
     typeof window !== "undefined" && window.location.search.includes("perf");
+
+  useEffect(() => {
+    useMind.getState().loadDiscovered();
+  }, []);
 
   return (
     <div className="experience-root">
@@ -38,6 +47,9 @@ export default function Experience() {
       <WindowManager />
       <SpotlightTerminal />
       <Hud />
+      <Compass />
+      <Minimap />
+      <TravelHud />
       <GlobalHotkeys />
       <DeepLink />
     </div>

@@ -75,7 +75,28 @@ export const REGIONS: Record<string, RegionMeta> = {
     domain: "Identity · Nucleus",
     hemisphere: "central",
     center: [0, -1, 0],
-    radius: 2.2,
+    radius: 3.2,
+  },
+  // Node-cluster regions embedded in the brain volume (not particle lobes).
+  projects: {
+    id: "projects",
+    name: "Projects",
+    color: "#3ddc97",
+    blurb: "Flagship builds — the things made real.",
+    domain: "Flagship Builds",
+    hemisphere: "right",
+    center: [9, 0, 4],
+    radius: 5.5,
+  },
+  research: {
+    id: "research",
+    name: "Research",
+    color: "#6f8cff",
+    blurb: "Open questions and the frontier being explored.",
+    domain: "Frontier Topics",
+    hemisphere: "right",
+    center: [-6, 6, -10],
+    radius: 5.5,
   },
 };
 
@@ -90,6 +111,8 @@ export const REGION_ORDER: RegionId[] = [
   "cerebellum",
   "stem",
   "core",
+  "projects",
+  "research",
 ];
 
 export function regionIndex(id: RegionId): number {

@@ -14,8 +14,21 @@ export const RegionId = z.enum([
   "cerebellum",
   "stem",
   "core",
+  "projects",
+  "research",
 ]);
 export type RegionId = z.infer<typeof RegionId>;
+
+/** Node hierarchy levels (Phase 2 §3). Drives size + glow. */
+export const TierSchema = z.enum(["legendary", "major", "standard", "minor"]);
+export type Tier = z.infer<typeof TierSchema>;
+
+const TIER_IMPORTANCE: Record<Tier, number> = {
+  legendary: 1,
+  major: 0.82,
+  standard: 0.6,
+  minor: 0.4,
+};
 
 export const NodeKind = z.enum([
   "project",
@@ -39,30 +52,44 @@ const LinkSchema = z.object({
   url: z.string(),
 });
 
-export const NodeSchema = z.object({
-  id: z.string(),
-  type: NodeType.default("node"),
-  kind: NodeKind.optional(),
-  title: z.string(),
-  subtitle: z.string().optional(),
-  parentId: z.string().nullable().default(null),
-  region: RegionId,
-  /** Drives node size, LOD priority, and visual weight. 0..1 */
-  importance: z.number().min(0).max(1).default(0.5),
-  tags: z.array(z.string()).default([]),
-  /** Explicit, curated edges (node ids). */
-  connections: z.array(z.string()).default([]),
-  status: StatusSchema.optional(),
-  links: z.array(LinkSchema).default([]),
-  /** Body shown in the Information terminal (plain text / light markdown). */
-  content: z.string().default(""),
-  /** Powers the 2D fallback routes, search and crawlers. */
-  fallback: z.object({
-    summary: z.string(),
-    seoTitle: z.string().optional(),
-    seoDescription: z.string().optional(),
-  }),
-});
+export const NodeSchema = z
+  .object({
+    id: z.string(),
+    type: NodeType.default("node"),
+    kind: NodeKind.optional(),
+    title: z.string(),
+    subtitle: z.string().optional(),
+    parentId: z.string().nullable().default(null),
+    region: RegionId,
+    /** Optional sub-grouping within a region (e.g. "Languages"). */
+    cluster: z.string().optional(),
+    /** Hierarchy level — the primary weighting (Phase 2 §3). */
+    tier: TierSchema.optional(),
+    /** 0..1 weight; auto-derived from `tier` when tier is set. */
+    importance: z.number().min(0).max(1).default(0.5),
+    tags: z.array(z.string()).default([]),
+    /** Explicit, curated edges (node ids). */
+    connections: z.array(z.string()).default([]),
+    status: StatusSchema.optional(),
+    links: z.array(LinkSchema).default([]),
+    /** Body shown in the Information terminal (plain text / light markdown). */
+    content: z.string().default(""),
+    /** Powers the 2D fallback routes, search and crawlers. Auto-filled. */
+    fallback: z
+      .object({
+        summary: z.string(),
+        seoTitle: z.string().optional(),
+        seoDescription: z.string().optional(),
+      })
+      .optional(),
+  })
+  // Keep authoring terse: derive importance from tier, and a fallback summary
+  // from content/title when omitted.
+  .transform((n) => ({
+    ...n,
+    importance: n.tier ? TIER_IMPORTANCE[n.tier] : n.importance,
+    fallback: n.fallback ?? { summary: n.content || n.title },
+  }));
 
 export type MindNode = z.infer<typeof NodeSchema>;
 

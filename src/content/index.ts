@@ -1,6 +1,13 @@
-import { NodeSchema, type Edge, type MindNode, type SearchDoc } from "./schema";
+import {
+  NodeSchema,
+  type Edge,
+  type MindNode,
+  type SearchDoc,
+  type Tier,
+} from "./schema";
 import { cerebellumRaw } from "./nodes.cerebellum";
 import { coreRaw } from "./nodes.core";
+import { mindRaw } from "./nodes.mind";
 import {
   REGION_LIST,
   REGION_ORDER,
@@ -19,6 +26,7 @@ import {
 const ALL_NODES: MindNode[] = NodeSchema.array().parse([
   ...cerebellumRaw,
   ...coreRaw,
+  ...mindRaw,
 ]);
 
 const NODE_BY_ID = new Map<string, MindNode>(ALL_NODES.map((n) => [n.id, n]));
@@ -29,6 +37,7 @@ function buildEdges(nodes: MindNode[]): Edge[] {
   const edges: Edge[] = [];
   for (const node of nodes) {
     for (const targetId of node.connections) {
+      if (targetId === node.id) continue; // drop self-loops
       const target = NODE_BY_ID.get(targetId);
       if (!target) continue; // drop dangling edges
       const key = [node.id, targetId].sort().join("::");
@@ -55,6 +64,17 @@ for (const e of ALL_EDGES) {
 
 export function getDegree(id: string): number {
   return DEGREE.get(id) ?? 0;
+}
+
+// --- node hierarchy tier (Phase 2 §3) ---------------------------------------
+export function getTier(node: MindNode): Tier {
+  if (node.tier) return node.tier;
+  if (node.type === "core") return "legendary";
+  const score = node.importance + getDegree(node.id) * 0.03;
+  if (score >= 0.95) return "legendary";
+  if (score >= 0.78) return "major";
+  if (score >= 0.55) return "standard";
+  return "minor";
 }
 
 // --- search docs (Blueprint §8: client index source) ------------------------
@@ -103,5 +123,5 @@ export function getPopulatedRegions() {
 }
 
 export { REGIONS, REGION_LIST, REGION_ORDER, getRegion, regionIndex };
-export type { MindNode, Edge, SearchDoc };
+export type { MindNode, Edge, SearchDoc, Tier };
 export type { RegionId, RegionMeta } from "./schema";

@@ -8,9 +8,11 @@ import AmbientField from "@/world/AmbientField";
 import BrainFormation from "@/brain/BrainFormation";
 import RegionSystem from "@/region/RegionSystem";
 import CoreAnchor from "@/region/CoreAnchor";
-import Cerebellum from "@/region/Cerebellum";
+import RegionNodes from "@/region/RegionNodes";
 import Synapses from "@/nodes/Synapses";
 import CameraDirector from "@/camera/CameraDirector";
+import CameraReporter from "@/camera/CameraReporter";
+import { getPopulatedRegions } from "@/content";
 
 /**
  * Scene assembly (inside the Canvas). Cosmic backdrop + dust for scale,
@@ -34,11 +36,14 @@ export default function Scene({ perf }: { perf: boolean }) {
 
       <CameraControls ref={controls} makeDefault />
       <CameraDirector controls={controls} />
+      <CameraReporter />
 
       <BrainFormation />
       <RegionSystem />
       <CoreAnchor />
-      <Cerebellum />
+      {getPopulatedRegions().map((r) => (
+        <RegionNodes key={r.id} regionId={r.id} />
+      ))}
       <Synapses />
 
       {perf && <Stats />}

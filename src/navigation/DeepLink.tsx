@@ -10,8 +10,11 @@ import { getNode } from "@/content";
  * the URL (path style on /brain, query style elsewhere). Back/forward works.
  */
 function readNodeFromUrl(): string | null {
-  const m = window.location.pathname.match(/^\/brain\/([^/]+)/);
-  if (m) return decodeURIComponent(m[1]);
+  const m = window.location.pathname.match(/^\/brain\/(.+)$/);
+  if (m) {
+    const segs = m[1].split("/").filter(Boolean);
+    return decodeURIComponent(segs[segs.length - 1] ?? "");
+  }
   return new URLSearchParams(window.location.search).get("node");
 }
 

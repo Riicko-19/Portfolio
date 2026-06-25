@@ -87,12 +87,18 @@ export default function BrainFormation() {
       ? regionIndex(hoveredRegionId as RegionId)
       : -1;
 
-    // Neural-web stage: fade in mid-formation, settle to a faint web.
+    // Neural-web stage: fade in mid-formation, settle to a faint web that
+    // keeps breathing once formed (Phase 2.5 — never fully dormant).
     if (webRef.current) {
       const p = m.uniforms.uProgress.value;
-      const fadeIn = THREE.MathUtils.smoothstep(p, 0.4, 0.62);
-      const settle = THREE.MathUtils.smoothstep(p, 0.78, 1.0);
-      webRef.current.opacity = fadeIn * (0.22 - settle * 0.16);
+      const tt = m.uniforms.uTime.value;
+      if (phase === "ready") {
+        webRef.current.opacity = 0.05 + Math.sin(tt * 0.7) * 0.03;
+      } else {
+        const fadeIn = THREE.MathUtils.smoothstep(p, 0.4, 0.62);
+        const settle = THREE.MathUtils.smoothstep(p, 0.78, 1.0);
+        webRef.current.opacity = fadeIn * (0.22 - settle * 0.16);
+      }
     }
   });
 

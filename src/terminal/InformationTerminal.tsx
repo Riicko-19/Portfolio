@@ -22,7 +22,7 @@ function Stars({ value }: { value: number }) {
 
 export default function InformationTerminal({ nodeId }: { nodeId: string }) {
   const node = getNode(nodeId);
-  const select = useMind((s) => s.select);
+  const beginTravel = useMind((s) => s.beginTravel);
   if (!node) return null;
   const region = getRegion(node.region);
   const neighbours = getNeighbourIds(nodeId);
@@ -30,6 +30,11 @@ export default function InformationTerminal({ nodeId }: { nodeId: string }) {
 
   return (
     <div className="info">
+      <div className="info-breadcrumb">
+        Brain <span className="bc-sep">▸</span>{" "}
+        <span style={{ color: region?.color }}>{region?.name}</span>{" "}
+        <span className="bc-sep">▸</span> {node.title}
+      </div>
       <div className="info-head">
         {node.kind && <span className="info-kind">{node.kind}</span>}
         {node.status && (
@@ -96,7 +101,8 @@ export default function InformationTerminal({ nodeId }: { nodeId: string }) {
                 <button
                   key={id}
                   className="conn-row"
-                  onClick={() => select(id)}
+                  onClick={() => beginTravel(id)}
+                  title={`Travel to ${n.title}`}
                 >
                   <span
                     className="conn-dot"

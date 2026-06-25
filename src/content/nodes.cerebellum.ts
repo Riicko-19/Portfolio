@@ -1,196 +1,45 @@
 /**
- * Cerebellum content (Blueprint §4) — Skills, Tech Stack & Tools.
- * The one fully-built region for the Phase 1 vertical slice.
- *
- * Authored as raw objects; validated against NodeSchema in `index.ts`.
- * Defaults (type, parentId, importance, etc.) are filled by the schema.
+ * Cerebellum — Skills & Technologies (Phase 2 World Population).
+ * Real stack. Terse authoring: tier drives importance; fallback auto-derives.
  */
 export const cerebellumRaw = [
-  {
-    id: "typescript",
-    kind: "tech",
-    title: "TypeScript",
-    subtitle: "Typed JavaScript at scale",
-    region: "cerebellum",
-    importance: 0.95,
-    tags: ["language", "frontend", "backend", "types"],
-    connections: ["react", "nextjs", "node", "threejs"],
-    status: "live",
-    links: [{ label: "Docs", url: "https://www.typescriptlang.org" }],
-    content:
-      "My default language for application code. Strict mode everywhere — the type system is a design tool, not paperwork. Drives the schemas, the state layer and the content pipeline of this very experience.",
-    fallback: {
-      summary:
-        "Primary application language. Strict TypeScript across frontend, backend and tooling.",
-    },
-  },
-  {
-    id: "react",
-    kind: "tech",
-    title: "React",
-    subtitle: "Declarative UI",
-    region: "cerebellum",
-    importance: 0.95,
-    tags: ["frontend", "ui", "javascript"],
-    connections: ["typescript", "nextjs", "threejs"],
-    status: "live",
-    links: [{ label: "Docs", url: "https://react.dev" }],
-    content:
-      "The backbone of every interface I build, including the declarative scene graph driving this brain via react-three-fiber. Hooks, suspense, and a disciplined state boundary.",
-    fallback: {
-      summary: "Core UI library. Powers both conventional interfaces and the R3F scene graph.",
-    },
-  },
-  {
-    id: "threejs",
-    kind: "tech",
-    title: "Three.js / R3F",
-    subtitle: "Real-time WebGL",
-    region: "cerebellum",
-    importance: 0.9,
-    tags: ["3d", "webgl", "graphics", "shaders"],
-    connections: ["react", "glsl", "typescript"],
-    status: "live",
-    links: [
-      { label: "three.js", url: "https://threejs.org" },
-      { label: "R3F", url: "https://docs.pmnd.rs/react-three-fiber" },
-    ],
-    content:
-      "Real-time 3D on the web. Instancing, custom shaders, camera choreography and performance budgets. This entire consciousness simulation is built on it.",
-    fallback: {
-      summary: "Real-time WebGL via three.js and react-three-fiber. Instancing, shaders, camera systems.",
-    },
-  },
-  {
-    id: "glsl",
-    kind: "skill",
-    title: "GLSL / Shaders",
-    subtitle: "Programming the GPU",
-    region: "cerebellum",
-    importance: 0.78,
-    tags: ["graphics", "gpu", "shaders", "math"],
-    connections: ["threejs"],
-    status: "live",
-    content:
-      "Vertex and fragment shaders for particle systems, flow effects and procedural materials. The brain formation you just watched is a single GPU draw driven by a custom shader.",
-    fallback: {
-      summary: "GPU programming with GLSL — particle systems, procedural materials, flow effects.",
-    },
-  },
-  {
-    id: "nextjs",
-    kind: "tech",
-    title: "Next.js",
-    subtitle: "The React framework",
-    region: "cerebellum",
-    importance: 0.85,
-    tags: ["frontend", "ssr", "framework"],
-    connections: ["react", "typescript", "node"],
-    status: "live",
-    links: [{ label: "Docs", url: "https://nextjs.org" }],
-    content:
-      "App Router, server components and SSR. Here it serves the crawlable 2D fallback while the 3D world runs as a client island — one content source, two presentations.",
-    fallback: {
-      summary: "React framework. SSR + App Router; serves this site's crawlable fallback layer.",
-    },
-  },
-  {
-    id: "node",
-    kind: "tech",
-    title: "Node.js",
-    subtitle: "Server-side JavaScript",
-    region: "cerebellum",
-    importance: 0.8,
-    tags: ["backend", "runtime", "javascript"],
-    connections: ["typescript", "nextjs", "postgres"],
-    status: "live",
-    content:
-      "APIs, build tooling and content pipelines. The runtime behind the services I ship.",
-    fallback: { summary: "Server-side runtime for APIs, tooling and content pipelines." },
-  },
-  {
-    id: "python",
-    kind: "tech",
-    title: "Python",
-    subtitle: "ML & scripting",
-    region: "cerebellum",
-    importance: 0.85,
-    tags: ["language", "ml", "data", "backend"],
-    connections: ["pytorch", "langchain"],
-    status: "live",
-    content:
-      "The language I reach for in the ML and data world — training loops, data wrangling, research scripts.",
-    fallback: { summary: "Primary language for ML, data work and research scripting." },
-  },
-  {
-    id: "pytorch",
-    kind: "tech",
-    title: "PyTorch",
-    subtitle: "Deep learning",
-    region: "cerebellum",
-    importance: 0.82,
-    tags: ["ml", "deep-learning", "ai", "gpu"],
-    connections: ["python", "langchain"],
-    status: "live",
-    links: [{ label: "Docs", url: "https://pytorch.org" }],
-    content:
-      "Building and training neural networks — from custom architectures to fine-tuning. Where the 'AI engineer' part of the mind lives.",
-    fallback: { summary: "Deep learning framework. Model building, training and fine-tuning." },
-  },
-  {
-    id: "langchain",
-    kind: "tech",
-    title: "LLM Tooling",
-    subtitle: "Agents & RAG",
-    region: "cerebellum",
-    importance: 0.8,
-    tags: ["ai", "llm", "agents", "rag"],
-    connections: ["python", "pytorch"],
-    status: "wip",
-    content:
-      "Retrieval-augmented generation, tool-using agents and evaluation harnesses around large language models — the systems work of applied AI.",
-    fallback: { summary: "Applied LLM systems — RAG, agents, evaluation harnesses." },
-  },
-  {
-    id: "postgres",
-    kind: "tech",
-    title: "PostgreSQL",
-    subtitle: "Relational data",
-    region: "cerebellum",
-    importance: 0.7,
-    tags: ["database", "backend", "sql"],
-    connections: ["node"],
-    status: "live",
-    content:
-      "My default datastore. Schema design, indexing and queries that earn their keep.",
-    fallback: { summary: "Primary relational database — schema design, indexing, query tuning." },
-  },
-  {
-    id: "docker",
-    kind: "tech",
-    title: "Docker",
-    subtitle: "Containers",
-    region: "cerebellum",
-    importance: 0.68,
-    tags: ["devops", "infra", "tooling"],
-    connections: ["node", "postgres"],
-    status: "live",
-    content:
-      "Reproducible environments from laptop to production. The packaging layer for everything I deploy.",
-    fallback: { summary: "Containerization for reproducible environments and deployment." },
-  },
-  {
-    id: "git",
-    kind: "skill",
-    title: "Git",
-    subtitle: "Version control",
-    region: "cerebellum",
-    importance: 0.65,
-    tags: ["tooling", "workflow", "collaboration"],
-    connections: ["docker"],
-    status: "live",
-    content:
-      "The connective tissue of any engineering team — branching strategy, clean history, code review as a craft.",
-    fallback: { summary: "Version control and collaboration workflow." },
-  },
+  // ---- Languages ----------------------------------------------------------
+  { id: "python", kind: "tech", title: "Python", cluster: "Languages", region: "cerebellum", tier: "major", tags: ["language", "ml", "backend"], connections: ["machine-learning", "agentic-ai", "fastapi", "flask", "math", "curiosity-engine", "isl-recognition"], status: "live", content: "Primary language — ML, backends, automation, and the glue of every project." },
+  { id: "java", kind: "tech", title: "Java", cluster: "Languages", region: "cerebellum", tier: "standard", tags: ["language"], connections: ["oop"], status: "live", content: "JVM language for robust, typed application code." },
+  { id: "c", kind: "tech", title: "C", cluster: "Languages", region: "cerebellum", tier: "standard", tags: ["language", "systems"], connections: ["operating-systems"], status: "live", content: "Close to the metal — where the fundamentals become tangible." },
+  { id: "javascript", kind: "tech", title: "JavaScript", cluster: "Languages", region: "cerebellum", tier: "standard", tags: ["language", "web"], connections: ["typescript", "react"], status: "live", content: "The language of the web and interactive interfaces." },
+  { id: "typescript", kind: "tech", title: "TypeScript", cluster: "Languages", region: "cerebellum", tier: "standard", tags: ["language", "web", "types"], connections: ["javascript", "react", "nextjs"], status: "live", content: "Typed JavaScript — design-by-types across frontend and tooling." },
+
+  // ---- AI / ML ------------------------------------------------------------
+  { id: "machine-learning", kind: "skill", title: "Machine Learning", cluster: "AI / ML", region: "cerebellum", tier: "major", tags: ["ai", "ml"], connections: ["deep-learning", "python", "pytorch", "product-pricing-model", "math"], status: "live", content: "Modelling from data — the core competency under the AI work." },
+  { id: "deep-learning", kind: "skill", title: "Deep Learning", cluster: "AI / ML", region: "cerebellum", tier: "major", tags: ["ai", "dl"], connections: ["neural-networks", "transformers", "computer-vision", "machine-learning"], status: "live", content: "Neural architectures at depth — representation learning." },
+  { id: "computer-vision", kind: "skill", title: "Computer Vision", cluster: "AI / ML", region: "cerebellum", tier: "major", tags: ["ai", "cv"], connections: ["deep-learning", "isl-recognition", "research-cv"], status: "live", content: "Teaching machines to see — recognition, detection, perception." },
+  { id: "neural-networks", kind: "skill", title: "Neural Networks", cluster: "AI / ML", region: "cerebellum", tier: "standard", tags: ["ai", "dl"], connections: ["deep-learning"], status: "live", content: "The building block of modern AI." },
+  { id: "transformers", kind: "skill", title: "Transformers", cluster: "AI / ML", region: "cerebellum", tier: "standard", tags: ["ai", "nlp"], connections: ["deep-learning", "research-transformers"], status: "live", content: "Attention-based models — the backbone of today's frontier systems." },
+  { id: "rag", kind: "skill", title: "RAG Systems", cluster: "AI / ML", region: "cerebellum", tier: "standard", tags: ["ai", "rag"], connections: ["agentic-ai", "knowledge-graphs", "memory-layer", "research-rag"], status: "live", content: "Retrieval-augmented generation — grounding models in real knowledge." },
+  { id: "agentic-ai", kind: "skill", title: "Agentic AI", cluster: "AI / ML", region: "cerebellum", tier: "major", tags: ["ai", "agents"], connections: ["rag", "prompt-engineering", "agent-runtime", "chanakya-os", "research-agentic"], status: "live", content: "Tool-using, planning agents — the heart of the Chanakya vision." },
+  { id: "prompt-engineering", kind: "skill", title: "Prompt Engineering", cluster: "AI / ML", region: "cerebellum", tier: "standard", tags: ["ai", "llm"], connections: ["agentic-ai"], status: "live", content: "Steering large models precisely and reliably." },
+  { id: "pytorch", kind: "tech", title: "PyTorch", cluster: "AI / ML", region: "cerebellum", tier: "major", tags: ["ai", "framework"], connections: ["deep-learning", "machine-learning", "sentinel", "mem-falling-into-ai"], status: "live", content: "Build and train neural networks — research to production." },
+
+  // ---- Development --------------------------------------------------------
+  { id: "react", kind: "tech", title: "React", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["frontend"], connections: ["typescript", "nextjs", "threejs"], status: "live", content: "Declarative UI for every interface I build." },
+  { id: "nextjs", kind: "tech", title: "Next.js", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["frontend", "ssr"], connections: ["react", "typescript"], status: "live", content: "The React framework — SSR, routing, this very site." },
+  { id: "threejs", kind: "tech", title: "Three.js / R3F", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["3d", "webgl"], connections: ["react", "neural-interfaces"], status: "live", content: "Real-time WebGL — the engine of this consciousness." },
+  { id: "flask", kind: "tech", title: "Flask", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["backend", "api"], connections: ["python", "api-design"], status: "live", content: "Lightweight Python web services." },
+  { id: "fastapi", kind: "tech", title: "FastAPI", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["backend", "api"], connections: ["python", "api-design", "isl-recognition"], status: "live", content: "Typed, async Python APIs — how my models get served." },
+  { id: "nodejs", kind: "tech", title: "Node.js", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["backend"], connections: ["javascript", "scheduler"], status: "live", content: "Server-side JavaScript runtime." },
+  { id: "docker", kind: "tech", title: "Docker", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["devops"], connections: ["linux", "cloud-fundamentals", "isl-recognition"], status: "live", content: "Reproducible environments from laptop to production." },
+  { id: "git", kind: "tech", title: "Git", cluster: "Development", region: "cerebellum", tier: "minor", tags: ["tooling"], connections: ["docker"], status: "live", content: "Version control and the craft of clean history." },
+  { id: "linux", kind: "tech", title: "Linux", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["os", "tooling"], connections: ["operating-systems", "docker", "mem-discovering-linux"], status: "live", content: "My daily environment — and a turning point in how I think about systems." },
+  { id: "mongodb", kind: "tech", title: "MongoDB", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["database"], connections: ["databases", "database-design"], status: "live", content: "Document store for flexible schemas." },
+  { id: "postgresql", kind: "tech", title: "PostgreSQL", cluster: "Development", region: "cerebellum", tier: "standard", tags: ["database"], connections: ["databases", "memory-layer"], status: "live", content: "Relational workhorse — the default datastore." },
+  { id: "supabase", kind: "tech", title: "Supabase", cluster: "Development", region: "cerebellum", tier: "minor", tags: ["backend"], connections: ["postgresql"], status: "live", content: "Postgres-backed backend-as-a-service." },
+  { id: "firebase", kind: "tech", title: "Firebase", cluster: "Development", region: "cerebellum", tier: "minor", tags: ["backend"], connections: ["nodejs"], status: "live", content: "Realtime backend for quick product builds." },
+
+  // ---- System Skills ------------------------------------------------------
+  { id: "system-design", kind: "skill", title: "System Design", cluster: "System Skills", region: "cerebellum", tier: "major", tags: ["systems"], connections: ["api-design", "distributed-systems", "chanakya", "system-maps"], status: "live", content: "Designing systems that scale, observe and recover." },
+  { id: "api-design", kind: "skill", title: "API Design", cluster: "System Skills", region: "cerebellum", tier: "standard", tags: ["systems", "api"], connections: ["fastapi", "system-design"], status: "live", content: "Clean, versioned contracts between services." },
+  { id: "database-design", kind: "skill", title: "Database Design", cluster: "System Skills", region: "cerebellum", tier: "standard", tags: ["data"], connections: ["databases", "data-structures"], status: "live", content: "Modelling state — schemas, indexes, integrity." },
+  { id: "networking", kind: "skill", title: "Networking", cluster: "System Skills", region: "cerebellum", tier: "standard", tags: ["systems"], connections: ["computer-networks", "distributed-systems"], status: "live", content: "How distributed pieces talk." },
+  { id: "cloud-fundamentals", kind: "skill", title: "Cloud Fundamentals", cluster: "System Skills", region: "cerebellum", tier: "standard", tags: ["cloud", "devops"], connections: ["docker", "distributed-systems"], status: "live", content: "Deploying and scaling in the cloud." },
 ];

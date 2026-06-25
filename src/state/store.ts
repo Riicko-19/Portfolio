@@ -44,6 +44,29 @@ interface MindState {
   // --- camera intent (Director is the sole executor) ---
   cameraMode: CameraMode;
 
+  // --- neural travel (Phase 2B) ---
+  traveling: boolean;
+  travelFrom: string | null;
+  travelTo: string | null;
+  travelProgress: number;
+  /** Ride the synapse from the current node to `toId`; falls back to select. */
+  beginTravel: (toId: string) => void;
+  endTravel: () => void;
+
+  // --- camera readout for the HUD (compass / minimap) ---
+  cameraInfo: { x: number; y: number; z: number; azimuth: number };
+  setCameraInfo: (info: {
+    x: number;
+    y: number;
+    z: number;
+    azimuth: number;
+  }) => void;
+
+  // --- discovery (Phase 2B) ---
+  discovered: Record<string, true>;
+  markDiscovered: (id: string) => void;
+  loadDiscovered: () => void;
+
   // --- node world positions, registered by the region on mount ---
   nodePositions: Record<string, Vec3>;
   registerPositions: (positions: Record<string, Vec3>) => void;
@@ -85,9 +108,60 @@ export const useMind = create<MindState>((set, get) => ({
     }
     set({ selectedNodeId: id, cameraMode: "focus" });
     get().openInfo(id);
+    get().markDiscovered(id);
   },
 
   cameraMode: "orbit",
+
+  traveling: false,
+  travelFrom: null,
+  travelTo: null,
+  travelProgress: 0,
+  beginTravel: (toId) => {
+    const { selectedNodeId, nodePositions } = get();
+    const from = selectedNodeId;
+    if (!from || from === toId || !nodePositions[from] || !nodePositions[toId]) {
+      get().select(toId);
+      return;
+    }
+    set({ traveling: true, travelFrom: from, travelTo: toId, travelProgress: 0 });
+  },
+  endTravel: () => {
+    const toId = get().travelTo;
+    set({ traveling: false, travelProgress: 1 });
+    if (toId) get().select(toId);
+  },
+
+  cameraInfo: { x: 27, y: 10, z: 40, azimuth: 0 },
+  setCameraInfo: (cameraInfo) => set({ cameraInfo }),
+
+  discovered: {},
+  markDiscovered: (id) =>
+    set((s) => {
+      if (s.discovered[id]) return s;
+      const discovered = { ...s.discovered, [id]: true as const };
+      try {
+        localStorage.setItem(
+          "itm-discovered",
+          JSON.stringify(Object.keys(discovered)),
+        );
+      } catch {
+        /* ignore */
+      }
+      return { discovered };
+    }),
+  loadDiscovered: () => {
+    try {
+      const raw = localStorage.getItem("itm-discovered");
+      if (!raw) return;
+      const ids: string[] = JSON.parse(raw);
+      const discovered: Record<string, true> = {};
+      ids.forEach((id) => (discovered[id] = true));
+      set({ discovered });
+    } catch {
+      /* ignore */
+    }
+  },
 
   nodePositions: {},
   registerPositions: (positions) =>

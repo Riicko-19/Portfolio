@@ -2,20 +2,21 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import MiniSearch from "minisearch";
-import { getSearchDocs } from "@/content";
+import { getSearchDocs, REGION_LIST } from "@/content";
 import { useMind } from "@/state/store";
+import { bus } from "@/state/bus";
 
 /**
- * Spotlight / ⌘K (Blueprint §8 fast-lane, §9 Search Terminal). Client-side
- * MiniSearch over the content docs; selecting a result focuses the camera and
- * opens its Information terminal. The "wander OR warp" fast path.
+ * Spotlight / ⌘K (Blueprint §8; Phase 2 §6). Fuzzy search across nodes AND
+ * regions. Selecting a node focuses it + opens its terminal; selecting a
+ * region fast-travels there. The "wander OR warp" fast path.
  */
 interface Row {
+  type: "node" | "region";
   id: string;
   title: string;
-  subtitle: string;
-  kind: string;
-  region: string;
+  meta: string;
+  color?: string;
 }
 
 export default function SpotlightTerminal() {
@@ -30,7 +31,7 @@ export default function SpotlightTerminal() {
   const mini = useMemo(() => {
     const ms = new MiniSearch({
       fields: ["title", "subtitle", "tags", "summary", "kind"],
-      storeFields: ["title", "subtitle", "region", "kind"],
+      storeFields: ["title", "kind", "region"],
       searchOptions: { prefix: true, fuzzy: 0.2, boost: { title: 3, tags: 2 } },
     });
     ms.addAll(docs);
@@ -38,22 +39,36 @@ export default function SpotlightTerminal() {
   }, [docs]);
 
   const results: Row[] = useMemo(() => {
-    if (!q.trim()) {
-      return docs.slice(0, 8).map((d) => ({
-        id: d.id,
-        title: d.title,
-        subtitle: d.subtitle,
-        kind: d.kind,
-        region: d.region,
+    const query = q.trim().toLowerCase();
+    // Regions first.
+    const regions: Row[] = REGION_LIST.filter((r) =>
+      query
+        ? r.name.toLowerCase().includes(query) ||
+          r.domain.toLowerCase().includes(query) ||
+          r.id.includes(query)
+        : false,
+    )
+      .slice(0, 3)
+      .map((r) => ({
+        type: "region",
+        id: r.id,
+        title: r.name,
+        meta: r.domain,
+        color: r.color,
       }));
-    }
-    return mini.search(q).slice(0, 8).map((r) => ({
+
+    const nodeRows: Row[] = (
+      query
+        ? mini.search(q).slice(0, 8)
+        : docs.slice(0, 6).map((d) => ({ id: d.id, title: d.title, kind: d.kind, region: d.region }))
+    ).map((r) => ({
+      type: "node" as const,
       id: r.id as string,
       title: r.title as string,
-      subtitle: (r.subtitle as string) ?? "",
-      kind: r.kind as string,
-      region: r.region as string,
+      meta: `${r.kind as string} · ${r.region as string}`,
     }));
+
+    return [...regions, ...nodeRows].slice(0, 9);
   }, [q, mini, docs]);
 
   useEffect(() => {
@@ -69,8 +84,13 @@ export default function SpotlightTerminal() {
 
   if (!open) return null;
 
-  const choose = (id: string) => {
-    select(id);
+  const choose = (row: Row) => {
+    if (row.type === "region") {
+      if (row.id === "core") bus.emit("camera:recenter", undefined);
+      else bus.emit("camera:frameRegion", { regionId: row.id });
+    } else {
+      select(row.id);
+    }
     setSpotlight(false);
   };
 
@@ -84,7 +104,7 @@ export default function SpotlightTerminal() {
     } else if (e.key === "Enter") {
       e.preventDefault();
       const r = results[active];
-      if (r) choose(r.id);
+      if (r) choose(r);
     } else if (e.key === "Escape") {
       e.preventDefault();
       setSpotlight(false);
@@ -97,7 +117,7 @@ export default function SpotlightTerminal() {
         <input
           ref={inputRef}
           className="spotlight-input"
-          placeholder="Search the mind…  (try: react, shaders, ml)"
+          placeholder="Search the mind…  (nodes & regions — try: research, chanakya, python)"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={onKey}
@@ -108,19 +128,27 @@ export default function SpotlightTerminal() {
           )}
           {results.map((r, i) => (
             <button
-              key={r.id}
+              key={`${r.type}-${r.id}`}
               className={`sr ${i === active ? "is-active" : ""}`}
               onMouseEnter={() => setActive(i)}
-              onClick={() => choose(r.id)}
+              onClick={() => choose(r)}
             >
-              <span className="sr-title">{r.title}</span>
+              <span className="sr-title">
+                {r.type === "region" && (
+                  <span
+                    className="sr-region-dot"
+                    style={{ background: r.color }}
+                  />
+                )}
+                {r.title}
+              </span>
               <span className="sr-meta">
-                {r.kind} · {r.region}
+                {r.type === "region" ? `region · ${r.meta}` : r.meta}
               </span>
             </button>
           ))}
         </div>
-        <div className="spotlight-foot">↑↓ navigate · ↵ select · esc close</div>
+        <div className="spotlight-foot">↑↓ navigate · ↵ go · esc close</div>
       </div>
     </div>
   );

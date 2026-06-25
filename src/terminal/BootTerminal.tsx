@@ -23,6 +23,15 @@ export default function BootTerminal() {
   const [revealed, setRevealed] = useState(0);
   const done = revealed >= LINES.length;
 
+  // Returning-user fast-boot: skip the staggered reveal (Phase 2B).
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("itm-visited")) setRevealed(LINES.length);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   useEffect(() => {
     if (phase !== "boot" || revealed >= LINES.length) return;
     const t = setTimeout(() => setRevealed((r) => r + 1), 320 + revealed * 70);
@@ -31,6 +40,11 @@ export default function BootTerminal() {
 
   const proceed = useCallback(() => {
     if (useMind.getState().phase !== "boot") return;
+    try {
+      localStorage.setItem("itm-visited", "1");
+    } catch {
+      /* ignore */
+    }
     setRevealed(LINES.length);
     setPhase("forming");
   }, [setPhase]);

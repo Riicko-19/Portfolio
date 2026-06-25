@@ -1,0 +1,248 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Abijith G//CV MLOps Learning Plan//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:CV + MLOps Project Plan
+
+BEGIN:VEVENT
+UID:cvm-d01@abijith
+DTSTART:20260629T180000
+DTEND:20260629T200000
+SUMMARY:Day 1 - Repo setup + model out of notebook
+DESCRIPTION:Project A. Create repo (git + venv). Move sign-language CNN-Transformer from notebook into train.py / eval.py. Get one baseline run working end-to-end.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d02@abijith
+DTSTART:20260630T180000
+DTEND:20260630T200000
+SUMMARY:Day 2 - Refactor into modules
+DESCRIPTION:Split into data / model / train / eval modules. Start results.md (metrics table) and LEARNINGS.md (what broke + fix).
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d03@abijith
+DTSTART:20260701T180000
+DTEND:20260701T200000
+SUMMARY:Day 3 - Config management (Hydra)
+DESCRIPTION:Remove all hardcoded values into a Hydra config. Re-run and confirm the baseline metrics reproduce exactly.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d04@abijith
+DTSTART:20260702T180000
+DTEND:20260702T200000
+SUMMARY:Day 4 - Experiment tracking (MLflow)
+DESCRIPTION:Add MLflow. Log params, metrics, and model artifacts on every run. Goal: never lose a result again.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d05@abijith
+DTSTART:20260703T180000
+DTEND:20260703T200000
+SUMMARY:Day 5 - Run + compare experiments
+DESCRIPTION:Run 3-4 hyperparameter variants. Compare in the MLflow UI. Pick the best model. Note what mattered in LEARNINGS.md.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d06@abijith
+DTSTART:20260706T180000
+DTEND:20260706T200000
+SUMMARY:Day 6 - Version data + model (DVC)
+DESCRIPTION:Add DVC. Version the dataset and trained model. Understand why git-for-data exists.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d07@abijith
+DTSTART:20260707T180000
+DTEND:20260707T200000
+SUMMARY:Day 7 - Buffer + tidy
+DESCRIPTION:Catch up on any unfinished step. Tidy repo, update results.md + LEARNINGS.md. Do NOT start a new layer half-done.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d08@abijith
+DTSTART:20260708T180000
+DTEND:20260708T200000
+SUMMARY:Day 8 - Serve model (FastAPI)
+DESCRIPTION:Wrap inference in a FastAPI endpoint: load model, accept an image, return a prediction.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d09@abijith
+DTSTART:20260709T180000
+DTEND:20260709T200000
+SUMMARY:Day 9 - API validation + test
+DESCRIPTION:Add input validation and error handling. Write an automated API test.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d10@abijith
+DTSTART:20260710T180000
+DTEND:20260710T200000
+SUMMARY:Day 10 - Measure baseline latency
+DESCRIPTION:Measure and record baseline inference latency + throughput in results.md. This becomes a resume metric.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d11@abijith
+DTSTART:20260713T180000
+DTEND:20260713T200000
+SUMMARY:Day 11 - Containerize (Docker)
+DESCRIPTION:Write a Dockerfile for the API. Build the image. Run the container locally.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d12@abijith
+DTSTART:20260714T180000
+DTEND:20260714T200000
+SUMMARY:Day 12 - docker-compose + debug
+DESCRIPTION:Get the container serving requests reliably (ports, networking, paths). Where 'works on my machine' gets fixed.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d13@abijith
+DTSTART:20260715T180000
+DTEND:20260715T200000
+SUMMARY:Day 13 - Tests (pytest)
+DESCRIPTION:Write tests for data loading, model output shape, and the API response. Make them pass.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d14@abijith
+DTSTART:20260716T180000
+DTEND:20260716T200000
+SUMMARY:Day 14 - CI pipeline (GitHub Actions)
+DESCRIPTION:Add a GitHub Actions workflow: lint, run tests, build Docker image on push. Now 'deploy' is one trigger.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d15@abijith
+DTSTART:20260717T180000
+DTEND:20260717T200000
+SUMMARY:Day 15 - Buffer + fix CI
+DESCRIPTION:Fix CI flakiness, clean up. Update LEARNINGS.md. Half-week checkpoint - everything should run green.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d16@abijith
+DTSTART:20260720T180000
+DTEND:20260720T200000
+SUMMARY:Day 16 - Optimize model (ONNX/quantization)
+DESCRIPTION:CV depth. Export model to ONNX and/or quantize. Get it running through the API.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d17@abijith
+DTSTART:20260721T180000
+DTEND:20260721T200000
+SUMMARY:Day 17 - Benchmark before/after
+DESCRIPTION:Measure latency, throughput, model size, accuracy before vs after optimization. Record the table - top resume bullet (e.g. 'cut latency X%, <2% accuracy loss').
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d18@abijith
+DTSTART:20260722T180000
+DTEND:20260722T200000
+SUMMARY:Day 18 - Drift monitoring (Evidently)
+DESCRIPTION:Log predictions. Add data/concept drift detection with Evidently. Ties into your Sentinel monitoring theme.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d19@abijith
+DTSTART:20260723T180000
+DTEND:20260723T200000
+SUMMARY:Day 19 - Monitoring dashboard + alert
+DESCRIPTION:Add a simple monitoring dashboard and a drift alert. Confirm the full lifecycle works end-to-end.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d20@abijith
+DTSTART:20260724T180000
+DTEND:20260724T200000
+SUMMARY:Day 20 - Project A WRAP: README + report
+DESCRIPTION:Write Project A README + a 1-2 page report (architecture, metrics, learnings). PROJECT A DONE.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d21@abijith
+DTSTART:20260727T180000
+DTEND:20260727T200000
+SUMMARY:Day 21 - Project B: define study + baseline setup
+DESCRIPTION:Self-supervised CV study. Frame the question (low-label performance). Pick a small dataset. Set up supervised baseline at label budgets (1%, 10%, 100%).
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d22@abijith
+DTSTART:20260728T180000
+DTEND:20260728T200000
+SUMMARY:Day 22 - Project B: run supervised baseline
+DESCRIPTION:Train supervised baselines. Record accuracy vs label fraction. Your comparison point.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d23@abijith
+DTSTART:20260729T180000
+DTEND:20260729T200000
+SUMMARY:Day 23 - Project B: SSL pretraining
+DESCRIPTION:Implement self-supervised pretraining (SimCLR or DINO, small scale) on the unlabeled data.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d24@abijith
+DTSTART:20260730T180000
+DTEND:20260730T200000
+SUMMARY:Day 24 - Project B: fine-tune + compare
+DESCRIPTION:Fine-tune the pretrained model on the same low-label budgets. Compare directly to the supervised baseline.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d25@abijith
+DTSTART:20260731T180000
+DTEND:20260731T200000
+SUMMARY:Day 25 - Project B: ablations + plots
+DESCRIPTION:Run ablations. Make clean plots (accuracy vs labels, supervised vs SSL). Build the results table.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d26@abijith
+DTSTART:20260803T180000
+DTEND:20260803T200000
+SUMMARY:Day 26 - Project B: write study report
+DESCRIPTION:Write report: intro/question, method, results, limitations, future work. Aim for preprint quality. PROJECT B DONE.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d27@abijith
+DTSTART:20260804T180000
+DTEND:20260804T200000
+SUMMARY:Day 27 - Polish repos + READMEs
+DESCRIPTION:Polish both READMEs (setup, results, screenshots). Add per-project GitHub links. Clean commit history. Push everything public.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d28@abijith
+DTSTART:20260805T180000
+DTEND:20260805T200000
+SUMMARY:Day 28 - Publish study (arXiv/Zenodo)
+DESCRIPTION:Post the SSL study to arXiv (cs.CV) or Zenodo for a DOI. Now it is a citable technical report.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d29@abijith
+DTSTART:20260806T180000
+DTEND:20260806T200000
+SUMMARY:Day 29 - Update CV
+DESCRIPTION:Add both projects + new metric-driven bullets to Abijith_G_Academic_CV.tex. Add per-project links and the published report.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:cvm-d30@abijith
+DTSTART:20260807T180000
+DTEND:20260807T200000
+SUMMARY:Day 30 - Buffer + portfolio update
+DESCRIPTION:Overflow/catch-up. Add both projects to your portfolio site. Final review. DONE.
+END:VEVENT
+
+END:VCALENDAR
